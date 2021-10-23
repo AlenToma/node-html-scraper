@@ -1,0 +1,24 @@
+{
+  "name": "node-html-scraper",
+  "version": "1.0.0",
+  "description": "This library will parse html and help you scrap data from it and convert it to json.",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "html-parser",
+    "html-scraper",
+    "node-html-scraper",
+    "node-html-parser",
+    "utils-decorators",
+    "react-native-html-parser"
+  ],
+  "author": "Alen Toma",
+  "license": "MIT",
+  "dependencies": {
+    "node-html-parser": "^4.1.4",
+    "utils-decorators": "^1.10.2",
+    "react-native-html-parser": "^0.1.0"
+  }
+}
