@@ -43,7 +43,7 @@ var fetchedHtml=`<html>
 </ul>
 </div>
 </html>`
-// we add the url here is to be able to complete the image src if its a relative path.
+// we add the url here is to be able to complete the image src or link href if its a relative path.
 var parsedHtml = parseHtml(fetchedHtml, url);
 var items = toObject<ITest>(htmlParser.find(".item"))
             .field(x => x.name, a => a.select('.title').text())

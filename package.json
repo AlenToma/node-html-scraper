@@ -14,6 +14,14 @@
     "utils-decorators",
     "react-native-html-parser"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AlenToma/node-html-scraper.git"
+  },
+  "bugs": {
+    "url": "https://github.com/AlenToma/node-html-scraper/issues"
+  },
+  "homepage": "https://github.com/AlenToma/node-html-scraper",
   "author": "Alen Toma",
   "license": "MIT",
   "dependencies": {
