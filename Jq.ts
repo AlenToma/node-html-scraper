@@ -1,5 +1,6 @@
 import { parse as htmlParse } from 'node-html-parser';
 import {ISelector} from './types'
+import {toObject} from './Builder'
 const DomParser = require('react-native-html-parser').DOMParser
 const isEmptyOrSpaces =(str?: string | null)=>{
   return !str || str === null || str.match(/^ *$/) !== null || str.length <= 0;
@@ -109,6 +110,10 @@ export class Selector implements ISelector {
     }
 
     return new Selector(el, this.onlineParser);
+  }
+
+  toObject<T extends {}>(){
+   return toObject<T>(this);
   }
 
   closest(selector: string) {
