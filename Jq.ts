@@ -105,7 +105,7 @@ export class Selector implements ISelector {
     if (el) {
       if (el.querySelectorAll) el = Array.from(el.querySelectorAll(selector));
       else if (el.forEach) {
-        el = Array.from(el).map((x: any) => x.querySelectorAll(selector));
+        el = Array.from(el).map((x: any) => x.querySelectorAll(selector)).find(x=> x.length>0)
       }
     }
 
@@ -325,11 +325,9 @@ export class Selector implements ISelector {
       if (Array.isArray(this.element)) el = this.element;
       else el = [this.element];
     }
-
+    
     return new Selector(
-      el.filter((x, index, arr) =>
-        func(new Selector(x, this.onlineParser), index, arr)
-      ),
+      el.filter((x, index, arr) => func(new Selector(x, this.onlineParser), index, arr)),
       this.onlineParser,
       this.value
     );

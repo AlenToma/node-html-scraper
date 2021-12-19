@@ -1,6 +1,6 @@
 {
   "name": "node-html-scraper",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "This library will parse html and help you scrap data from it and convert it to json.",
   "main": "index.ts",
   "scripts": {
