@@ -20,8 +20,7 @@ const getColumns = (fn: any) => {
   return str;
 };
 
-const toObject = <T>(jg: ISelector) =>
-  new ObjectContructor<T>(jg) as IObjectContructor<T>;
+const toObject = <T>(jg: ISelector) => new ObjectContructor<T>(jg) as IObjectContructor<T>;
 const parseHtml = (html: string, baseUrl?: string) => new Selector(html, new OnlineParser(baseUrl)) as ISelector;
 
 const translate = (config: IObjectConfig[]) => {

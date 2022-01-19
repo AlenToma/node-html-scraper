@@ -1,22 +1,22 @@
 import { parse as htmlParse } from 'node-html-parser';
-import {ISelector} from './types'
-import {toObject} from './Builder'
+import { IObjectContructor, ISelector } from './types'
+import { toObject } from './Builder'
 const DomParser = require('react-native-html-parser').DOMParser
-const isEmptyOrSpaces =(str?: string | null)=>{
+const isEmptyOrSpaces = (str?: string | null) => {
   return !str || str === null || str.match(/^ *$/) !== null || str.length <= 0;
 }
 
 const parse = (html: string) => {
-    try {
-      var h = new DomParser().parseFromString('<div>' + html + '</div>', 'text/html');
-      return htmlParse(h);
-    } catch (error) {
-      console.log(error)
-    }
-   return htmlParse(html);
+  try {
+    var h = new DomParser().parseFromString('<div>' + html + '</div>', 'text/html');
+    return htmlParse(h);
+  } catch (error) {
+    console.log(error)
   }
+  return htmlParse(html);
+}
 
-const findAt=<T>(item: any, index: number)=>{
+const findAt = <T>(item: any, index: number) => {
   if (!item)
     return undefined as any;
   if (index < 0 || index >= item.length)
@@ -25,11 +25,11 @@ const findAt=<T>(item: any, index: number)=>{
   return item[index] as T;
 }
 
-const last=<T>(item: any)=> {
-    return (item && item.length != undefined && item.length>0 ? item[item.length - 1] : undefined) as T;
+const last = <T>(item: any) => {
+  return (item && item.length != undefined && item.length > 0 ? item[item.length - 1] : undefined) as T;
 }
 
-const single=<T>(item: any)=> {
+const single = <T>(item: any) => {
   return (item && item.length > 0 ? item[0] : undefined) as T;
 }
 export class OnlineParser {
@@ -37,7 +37,7 @@ export class OnlineParser {
   constructor(homePage?: string) {
     this.homePage = homePage;
   }
-  
+
   attr(selector: string, el?: Element | null) {
     return el?.getAttribute?.(selector) ?? '';
   }
@@ -46,12 +46,15 @@ export class OnlineParser {
     var url = str;
     if (isEmptyOrSpaces(url) || isEmptyOrSpaces(this.homePage)) return str ?? "";
 
-    url = url.trim();
-    if (url.startsWith('https') || url.startsWith('http') || url.startsWith('www'))
-      return url;
+    url = url?.trim();
 
-    if (url.startsWith('//')) return 'https:' + url;
-    if (url.startsWith('/')) url = url.substring(1);
+    if (url) {
+      if (url.startsWith('https') || url.startsWith('http') || url.startsWith('www'))
+        return url;
+
+      if (url.startsWith('//')) return 'https:' + url;
+      if (url.startsWith('/')) url = url.substring(1);
+    }
     if (this.homePage && this.homePage.endsWith('/')) this.homePage = this.homePage.slice(0, -1);
     return this.homePage + '/' + url; // relative url
   }
@@ -65,7 +68,7 @@ export class OnlineParser {
   }
 
   text(el?: HTMLElement | null, structuredText?: boolean) {
-    var htmlOrText = el?.innerHTML?? ""
+    var htmlOrText = el?.innerHTML ?? ""
     if (!htmlOrText || htmlOrText.trim() == '') return '';
     if (!/(<([^>]+)>)/gi.test(htmlOrText))
       return htmlOrText
@@ -92,7 +95,7 @@ export class Selector implements ISelector {
   onlineParser: OnlineParser;
   constructor(element: any, onlineParser: OnlineParser, value?: any) {
     if (typeof element === "string")
-        element = parse(element);
+      element = parse(element);
     this.element = Array.isArray(element) && !element.map ? Array.from(element) : element;
     if (this.element && this.element.select)
       this.element = this.element.element;
@@ -105,15 +108,16 @@ export class Selector implements ISelector {
     if (el) {
       if (el.querySelectorAll) el = Array.from(el.querySelectorAll(selector));
       else if (el.forEach) {
-        el = Array.from(el).map((x: any) => x.querySelectorAll(selector)).find(x=> x.length>0)
+        el = Array.from(el).map((x: any) => x.querySelectorAll(selector)).find(x => x.length > 0)
       }
     }
 
     return new Selector(el, this.onlineParser);
   }
 
-  toObject<T extends {}>(){
-   return toObject<T>(this);
+ toObject<T extends {}>() {
+    var item= toObject<T>((this as any) as ISelector) as IObjectContructor<T>;
+    return item;
   }
 
   closest(selector: string) {
@@ -151,7 +155,7 @@ export class Selector implements ISelector {
       if ((!value || isEmptyOrSpaces(value)) && x.length > 0)
         if (this.element) {
           if (Array.isArray(this.element))
-            value = this.onlineParser.attr(x.trim(), findAt(this.element,0));
+            value = this.onlineParser.attr(x.trim(), findAt(this.element, 0));
           else value = this.onlineParser.attr(x.trim(), this.element);
         }
     });
@@ -325,7 +329,7 @@ export class Selector implements ISelector {
       if (Array.isArray(this.element)) el = this.element;
       else el = [this.element];
     }
-    
+
     return new Selector(
       el.filter((x, index, arr) => func(new Selector(x, this.onlineParser), index, arr)),
       this.onlineParser,
@@ -352,7 +356,7 @@ export class Selector implements ISelector {
     var el = this.element;
     if (el) {
       if (Array.isArray(el))
-        el = Array.from(findAt<HTMLElement>(el,0)?.children ?? []);
+        el = Array.from(findAt<HTMLElement>(el, 0)?.children ?? []);
       else el = Array.from(el.children ?? []);
     }
     return new Selector(el, this.onlineParser);
