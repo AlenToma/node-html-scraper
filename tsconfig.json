@@ -16,5 +16,5 @@
       "rootDirs": ["src/"],
     },
     "include": ["src/**/*", "./typings"],
-    "exclude": ["node_modules", "bin", "**/__mocks__*", "**/*.spec.**", "test", "assets"]
+    "exclude": ["node_modules", "dist", "**/__mocks__*", "**/*.spec.**", "test", "assets"]
   }
