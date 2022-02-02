@@ -1,6 +1,6 @@
 import {toObject, parseHtml} from './Builder'
 
-export {
+export default {
   toObject,
   parseHtml
 };

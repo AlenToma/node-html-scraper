@@ -1,19 +1,19 @@
-import { parse as htmlParse } from 'node-html-parser';
 import { IObjectContructor, ISelector } from './types'
 import { toObject } from './Builder'
-const DomParser = require('react-native-html-parser').DOMParser
+import DomParser from 'advanced-html-parser'
+import { Element as HTMLElement, Node } from 'advanced-html-parser/types'
 const isEmptyOrSpaces = (str?: string | null) => {
   return !str || str === null || str.match(/^ *$/) !== null || str.length <= 0;
 }
 
+
 const parse = (html: string) => {
   try {
-    var h = new DomParser().parseFromString('<div>' + html + '</div>', 'text/html');
-    return htmlParse(h);
+    return DomParser.parse('<div>' + html + '</div>', 'text/html').documentElement;
   } catch (error) {
     console.log(error)
+    throw error;
   }
-  return htmlParse(html);
 }
 
 const findAt = <T>(item: any, index: number) => {
@@ -38,7 +38,7 @@ export class OnlineParser {
     this.homePage = homePage;
   }
 
-  attr(selector: string, el?: Element | null) {
+  attr(selector: string, el?: HTMLElement | null) {
     return el?.getAttribute?.(selector) ?? '';
   }
 
@@ -76,14 +76,13 @@ export class OnlineParser {
         .replace(/^[ ]+/g, '')
         .replace(/(?:\r\n|\r|\n)/g, '')
         .trim();
-    htmlOrText = htmlOrText.replace(/h5>|h1>|h2>|h3>|h4>|h6>|li>/g, 'p>');
     if (structuredText === false)
       return parse(`<div>${htmlOrText}</div>`)
-        .innerText.trim()
+        .innerText().trim()
         ?.replace(/(?=&)(.*?)(;)/g, '')
         .replace(/^[ ]+/g, '');
     return parse(`<div>${htmlOrText}</div>`)
-      .structuredText.trim()
+      .text().trim()
       ?.replace(/(?=&)(.*?)(;)/g, '')
       .replace(/^[ ]+/g, '');
   }
@@ -97,8 +96,8 @@ export class Selector implements ISelector {
     if (typeof element === "string")
       element = parse(element);
     this.element = Array.isArray(element) && !element.map ? Array.from(element) : element;
-    if (this.element && this.element.select)
-      this.element = this.element.element;
+    if (this.element && (this.element as any).select)
+      this.element = (this.element as any).element;
     this.onlineParser = onlineParser;
     this.value = value;
   }
@@ -106,7 +105,7 @@ export class Selector implements ISelector {
   find(selector: string) {
     var el = this.element;
     if (el) {
-      if (el.querySelectorAll) el = Array.from(el.querySelectorAll(selector));
+      if ((el).querySelectorAll) el = Array.from(el.querySelectorAll(selector));
       else if (el.forEach) {
         el = Array.from(el).map((x: any) => x.querySelectorAll(selector)).find(x => x.length > 0)
       }
@@ -115,8 +114,8 @@ export class Selector implements ISelector {
     return new Selector(el, this.onlineParser);
   }
 
- toObject<T extends {}>() {
-    var item= toObject<T>((this as any) as ISelector) as IObjectContructor<T>;
+  toObject<T extends {}>() {
+    var item = toObject<T>((this as any) as ISelector) as IObjectContructor<T>;
     return item;
   }
 
@@ -194,14 +193,18 @@ export class Selector implements ISelector {
     return this.value;
   }
 
+  clone() {
+    var el = Array.isArray(this.element) ? (this.length() > 1 ? this.parent().element : this.element[0]) : this.element;
+    if (el)
+      return new Selector(el.cloneNode(true), this.onlineParser);
+    return null;
+  }
+
   cleanInnerHTML() {
-    var value = this.outerHTML();
-    if (value) {
-      return new Selector(parse(value), this.onlineParser)
-        .remove('script, style, input')
-        .innerHTML();
-    }
-    return value;
+    var node = this.clone();
+    if (node)
+      return node.remove('script, style, input').innerHTML();
+    return "";
   }
 
   innerHTML() {
@@ -273,7 +276,7 @@ export class Selector implements ISelector {
 
     el.forEach((x: any) => {
       if (x.querySelectorAll)
-        x.querySelectorAll(selector).forEach((a: any) => a.remove());
+        x.querySelectorAll(selector).forEach((a: Node) => a.remove());
     });
 
     return new Selector(this.element, this.onlineParser, this.value);
@@ -340,8 +343,8 @@ export class Selector implements ISelector {
   parent() {
     var el = this.element;
     if (el) {
-      if (Array.isArray(el)) el = findAt<HTMLElement>(el, 0)?.parentElement;
-      else el = el.parentElement;
+      if (Array.isArray(el)) el = findAt<HTMLElement>(el, 0)?.parentNode;
+      else el = el.parentNode;
     }
     return new Selector(el, this.onlineParser);
   }

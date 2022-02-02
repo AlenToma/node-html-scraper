@@ -54,6 +54,8 @@ export interface ISelector {
   children: ()=> ISelector;
 
   toObject:<T extends {}>() => IObjectContructor<T>
+
+  clone:()=> ISelector
 }
 
 export interface IObjectConfig {

@@ -23,7 +23,7 @@ interface IChild {
 ```
 
 ```js
-import {parseHtml} from 'node-html-scraper'
+import Parser from 'node-html-scraper'
 var url = "www.google.se";
 var fetchedHtml=`<html>
 <div class="item">
@@ -44,7 +44,7 @@ var fetchedHtml=`<html>
 </div>
 </html>`
 // we add the url here is to be able to complete the image src or link href if its a relative path.
-var parsedHtml = parseHtml(fetchedHtml, url);
+var parsedHtml = Parser.parseHtml(fetchedHtml, url);
 var items = parsedHtml.find(".item").toObject<ITest>()
             .field(x => x.name, a => a.select('.title').text())
             .field(x=> x.image, x=> x.select("img").attr("src").url())   
@@ -83,7 +83,7 @@ note: for `path` see the settings below.
         ],
       },
     ];
-var parsedHtml = parseHtml(fetchedHtml, url);
+var parsedHtml = Parser.parseHtml(fetchedHtml, url);
 // see the result below
 var items = parsedHtml.find(".item").toObject<ITest>().translate(config).toList();
 ```
